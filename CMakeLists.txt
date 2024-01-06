@@ -29,6 +29,7 @@ add_compile_options(-Wall
         )
 
 add_library(${PROJECT_NAME}
+        src/cilo72/core/statemachine.cpp
         src/cilo72/hw/pio.cpp
         src/cilo72/hw/blink_forever.cpp
         src/cilo72/hw/repeating_timer.cpp
@@ -40,6 +41,7 @@ add_library(${PROJECT_NAME}
         src/cilo72/ic/ws2812.cpp
         src/cilo72/ic/ky_040.cpp
         src/cilo72/ic/ssd1306.cpp
+        src/cilo72/ic/mcp2515.cpp
         src/cilo72/ic/tmc5160.cpp
         src/cilo72/ic/bh1750fvi.cpp
         src/cilo72/ic/sd2405.cpp

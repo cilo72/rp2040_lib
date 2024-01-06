@@ -39,8 +39,14 @@ namespace cilo72
              */
             spi_inst_t *instance() const { return spiInstance_; };
 
+            void config(uint baudrate, uint data_bits, spi_cpol_t cpol, spi_cpha_t cpha);
+
         private:
             spi_inst_t *spiInstance_; /**< The SPI instance used by this SPIBus object. */
+            uint baudrate_;
+            uint data_bits_;
+            spi_cpol_t cpol_;
+            spi_cpha_t cpha_;
         };
     }
 }

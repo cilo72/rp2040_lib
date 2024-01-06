@@ -22,6 +22,10 @@ namespace cilo72
 
         SPIBus::SPIBus(uint8_t pin_spi_sck, uint8_t pin_spi_rx, uint8_t pin_spi_tx)
             : spiInstance_(nullptr)
+            , baudrate_(1000000)
+            , data_bits_(8)
+            , cpol_(SPI_CPOL_1)
+            , cpha_(SPI_CPHA_1)
         {
             int instance = -1;
             if (pin_spi_sck == 2 and pin_spi_rx == 0 and pin_spi_tx == 3)
@@ -59,11 +63,28 @@ namespace cilo72
 
             assert(spiInstance_ != nullptr);
 
-            spi_init(spiInstance_, 1000 * 1000);
-            spi_set_format(spiInstance_, 8, SPI_CPOL_1, SPI_CPHA_1, SPI_MSB_FIRST);
+            spi_init(spiInstance_, baudrate_);
+            spi_set_format(spiInstance_, data_bits_, cpol_, cpha_, SPI_MSB_FIRST);
             gpio_set_function(pin_spi_rx, GPIO_FUNC_SPI);
             gpio_set_function(pin_spi_sck, GPIO_FUNC_SPI);
             gpio_set_function(pin_spi_tx, GPIO_FUNC_SPI);
+        }
+
+        void SPIBus::config(uint baudrate, uint data_bits, spi_cpol_t cpol, spi_cpha_t cpha)
+        {
+            if(baudrate != baudrate_)
+            {
+                spi_set_baudrate(spiInstance_, baudrate);
+                baudrate_ = baudrate;
+            }
+
+            if(data_bits != data_bits_ or cpol != cpol_ or cpha != cpha_)
+            {
+              spi_set_format(spiInstance_, data_bits_, cpol_, cpha_, SPI_MSB_FIRST);
+              data_bits_ = data_bits;
+              cpol_      = cpol;
+              cpha_      = cpha;
+            }
         }
     }
 }
