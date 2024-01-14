@@ -9,6 +9,7 @@ The RP2040 library contains C++ classes for some integrated circuits, displays, 
 - Neopixel WS2812
 - Stepper motor controller TMC5160 (SPI)
 - Displays based on SSD1306 (I2C)
+- Displays based on ST7735 (SPI)
 - RTC 2405 (I2C)
 - KY-040 rotary encoder (GPIOs)
 - Fermion DFPlayer Pro (UART)
