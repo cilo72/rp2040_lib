@@ -45,6 +45,7 @@ add_library(${PROJECT_NAME}
         src/cilo72/ic/tmc5160.cpp
         src/cilo72/ic/bh1750fvi.cpp
         src/cilo72/ic/sd2405.cpp
+        src/cilo72/ic/st7735s.cpp
         src/cilo72/ic/df_player_pro.cpp
         src/cilo72/motion/tmc5160.cpp
         src/cilo72/fonts/font_8x5.cpp
@@ -52,6 +53,10 @@ add_library(${PROJECT_NAME}
         src/cilo72/fonts/font_bmspa.cpp
         src/cilo72/fonts/font_bubblesstandard.cpp
         src/cilo72/fonts/font_crackers.cpp
+        src/cilo72/graphic/COLOR.cpp
+        src/cilo72/graphic/framebuffer.cpp
+        src/cilo72/graphic/framebuffer_monochrome.cpp
+        src/cilo72/graphic/framebuffer_rgb565.cpp
         )
 
 pico_enable_stdio_usb(${PROJECT_NAME} 1)

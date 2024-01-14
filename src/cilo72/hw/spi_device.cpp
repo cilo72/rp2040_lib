@@ -9,11 +9,6 @@ namespace cilo72
 {
   namespace hw
   {
-    SPIDevice::SPIDevice(SPIBus &spiBus, uint8_t pin_spi_csn)
-        : SPIDevice(spiBus, pin_spi_csn, 1000000, 8, SPI_CPOL_1, SPI_CPHA_1)
-    {
-    }
-
     SPIDevice::SPIDevice(SPIBus &spiBus, uint8_t pin_spi_csn, uint baudrate, uint data_bits, spi_cpol_t cpol, spi_cpha_t cpha)
         : spiBus_(spiBus), pin_spi_csn_(pin_spi_csn), baudrate_(baudrate), data_bits_(data_bits), cpol_(cpol), cpha_(cpha)
     {
@@ -27,6 +22,17 @@ namespace cilo72
       spiBus_.config(baudrate_, data_bits_, cpol_, cpha_);
       csSelect();
       spi_write_read_blocking(spiBus_.instance(), tx, rx, len);
+      csDeselect();
+    }
+
+    void SPIDevice::write(const uint8_t *tx, size_t len, uint32_t repeat) const
+    {
+      spiBus_.config(baudrate_, data_bits_, cpol_, cpha_);
+      csSelect();
+      for(uint32_t i = 0; i < repeat; i++)
+      {
+        spi_write_blocking(spiBus_.instance(), tx, len);
+      }
       csDeselect();
     }
 

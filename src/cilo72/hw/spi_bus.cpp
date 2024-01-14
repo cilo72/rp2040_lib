@@ -20,6 +20,11 @@ namespace cilo72
             std::vector<SPIInstance> spiInstances_ = {{spi0, false}, {spi1, false}};
         }
 
+        SPIBus::SPIBus(uint8_t pin_spi_sck, uint8_t pin_spi_tx)
+            : SPIBus(pin_spi_sck, PIN_NOT_USED, pin_spi_tx)
+        {
+        }
+
         SPIBus::SPIBus(uint8_t pin_spi_sck, uint8_t pin_spi_rx, uint8_t pin_spi_tx)
             : spiInstance_(nullptr)
             , baudrate_(1000000)
@@ -28,23 +33,23 @@ namespace cilo72
             , cpha_(SPI_CPHA_1)
         {
             int instance = -1;
-            if (pin_spi_sck == 2 and pin_spi_rx == 0 and pin_spi_tx == 3)
+            if (pin_spi_sck == 2 and ((pin_spi_rx == 0) or pin_spi_rx == PIN_NOT_USED) and pin_spi_tx == 3)
             {
                 instance = 0;
             }
-            else if (pin_spi_sck == 6 and pin_spi_rx == 4 and pin_spi_tx == 7)
+            else if (pin_spi_sck == 6 and ((pin_spi_rx == 4) or pin_spi_rx == PIN_NOT_USED) and pin_spi_tx == 7)
             {
                 instance = 0;
             }
-            else if (pin_spi_sck == 10 and pin_spi_rx == 8 and pin_spi_tx == 11)
+            else if (pin_spi_sck == 10 and ((pin_spi_rx == 8) or pin_spi_rx == PIN_NOT_USED) and pin_spi_tx == 11)
             {
                 instance = 1;
             }
-            else if (pin_spi_sck == 14 and pin_spi_rx == 12 and pin_spi_tx == 15)
+            else if (pin_spi_sck == 14 and ((pin_spi_rx == 12) or pin_spi_rx == PIN_NOT_USED) and pin_spi_tx == 15)
             {
                 instance = 1;
             }
-            else if (pin_spi_sck == 18 and pin_spi_rx == 16 and pin_spi_tx == 19)
+            else if (pin_spi_sck == 18 and ((pin_spi_rx == 16) or pin_spi_rx == PIN_NOT_USED) and pin_spi_tx == 19)
             {
                 instance = 0;
             }
@@ -65,7 +70,10 @@ namespace cilo72
 
             spi_init(spiInstance_, baudrate_);
             spi_set_format(spiInstance_, data_bits_, cpol_, cpha_, SPI_MSB_FIRST);
-            gpio_set_function(pin_spi_rx, GPIO_FUNC_SPI);
+            if(pin_spi_rx != PIN_NOT_USED)
+            {
+                gpio_set_function(pin_spi_rx, GPIO_FUNC_SPI);
+            }
             gpio_set_function(pin_spi_sck, GPIO_FUNC_SPI);
             gpio_set_function(pin_spi_tx, GPIO_FUNC_SPI);
         }

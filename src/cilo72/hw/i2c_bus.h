@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include "hardware/i2c.h"
+#include <functional>
 
 namespace cilo72
 {
@@ -31,10 +32,25 @@ namespace cilo72
              * @brief Writes data to a device.
              * @param addr The address of the device.
              * @param src A pointer to the source data to be written.
-             * @param len The number of bytes to write.
+             * @param len The number of bytes to write, must be one ore more.
+             * @param nostop If true, the stop bit is not set after the write operation.
              * @return True if the write operation was successful, false otherwise.
+             * @note This function is blocking.
              */
-            bool writeBlocking(uint8_t addr, const uint8_t *src, size_t len) const;
+            bool writeBlocking(uint8_t addr, const uint8_t *src, size_t len, bool nostop = false) const;
+
+
+            /**
+             * @brief Writes data to a device.
+             * @param addr The address of the device.
+             * @param data A function that provides the data to be written.
+             * @return True if the write operation was successful, false otherwise.
+             * @note This function is blocking.
+             * 
+             * index is the index of the byte to be written, byte is the byte to be written.
+             * The function must return true if more data has to be written, false otherwise.
+             */
+            bool writeBlocking(uint8_t addr, std::function<bool(size_t index, uint8_t & byte)> data) const;
 
             /**
              * @brief Reads data from a device.

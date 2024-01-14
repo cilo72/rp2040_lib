@@ -24,6 +24,16 @@ namespace cilo72
         class SPIBus
         {
         public:
+            static constexpr uint8_t PIN_NOT_USED = 255; /**< The pin number indicating that the pin is not used. */
+
+            /**
+             * @brief Constructs an SPIBus object with the given SCK, and TX pins.
+             * The constructor selects the SPI instance according the pins. If the instance is already used, an assertion occurs.
+             * @param pin_spi_sck The SCK pin number.
+             * @param pin_spi_tx The TX pin number.
+             */
+            SPIBus(uint8_t pin_spi_sck, uint8_t pin_spi_tx);
+
             /**
              * @brief Constructs an SPIBus object with the given SCK, RX, and TX pins.
              * The constructor selects the SPI instance according the pins. If the instance is already used, an assertion occurs.

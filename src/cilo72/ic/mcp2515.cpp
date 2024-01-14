@@ -138,7 +138,6 @@ namespace cilo72
             : spi_(spi), oscillator_(oscillator), bitrate_(bitrate)
         {
             spi_.setFormat(8, SPI_CPOL_0, SPI_CPHA_0);
-            // reset();
         }
 
         MCP2515::Error MCP2515::reset()
