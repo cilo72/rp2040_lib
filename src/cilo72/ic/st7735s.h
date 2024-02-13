@@ -9,6 +9,7 @@
 #include "pico/stdlib.h"
 #include "cilo72/hw/spi_device.h"
 #include "cilo72/hw/gpio.h"
+#include "cilo72/hw/pwm.h"
 #include "cilo72/graphic/framebuffer_rgb565.h"
 
 namespace cilo72
@@ -61,6 +62,12 @@ namespace cilo72
              */
             cilo72::graphic::FramebufferRGB565 & framebuffer() const { return fb_;}
 
+            /*!
+             * @brief Set backlight level
+             * @param level Level 0 - 100%
+             */
+            void setBacklight(uint32_t level) const;
+
         protected:
             enum ScanDirection
             {
@@ -103,7 +110,7 @@ namespace cilo72
             cilo72::hw::SPIDevice &spi_;
             cilo72::hw::Gpio pinDC_;
             cilo72::hw::Gpio pinRST_;
-            cilo72::hw::Gpio pinBL_;
+            cilo72::hw::Pwm pinBL_;
             ScanDirection scanDirection_;
             bool swap_;
 

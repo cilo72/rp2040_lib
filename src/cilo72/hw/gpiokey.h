@@ -8,25 +8,23 @@
 #include "pico/stdlib.h"
 #include "cilo72/hw/repeating_timer.h"
 #include "cilo72/hw/debounce.h"
+#include "cilo72/hw/gpio.h"
 
 namespace cilo72
 {
   namespace hw
   {
     /**
-     * @class KY_040
-     * A class for handling KY-040 rotary encoder.
+     * @class GpioKey
+     * @brief A class for debouncing inputs
      */
     class GpioKey
     {
     public:
       /**
-       * Constructor for KY_040.
-       * @param pinSW The pin for detecting button press.
-       * @param pinDT The pin for detecting rotation direction.
-       * @param pinCLK The pin for detecting rotation.
+       * @brief Constructor for the GpioKey class
        */
-      GpioKey(uint8_t pinKey);
+      GpioKey(uint8_t pinKey, Gpio::Pull pull);
 
       /**
        * Check if the button is pressed.
@@ -34,17 +32,25 @@ namespace cilo72
        */
       bool isPressed() const;
 
+      /**
+       * Check if the button is pressed.
+       * @return True if the button is pressed, false otherwise.
+       */
       operator const bool & () const 
       { 
         return down_; 
       }
 
+      /**
+       * Check if the button is pressed.
+       * @return True if the button is pressed, false otherwise.
+       */
       bool pressed();
 
     private:
       cilo72::hw::RepeatingTimer repeatingTimer_; ///< Timer used for debouncing.
-      uint8_t pinKey_;                             ///< Pin for detecting button press.
-      bool down_;                                   ///< Current button state.
+      Gpio gpio_;                                 ///< Pin for detecting button press.
+      bool down_;                                 ///< Current button state.
       bool lastDown_;
       cilo72::hw::Debounce debounceSW_;           ///< Debounce object for button press.
       bool pressed_;

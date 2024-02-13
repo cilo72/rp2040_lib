@@ -5,6 +5,7 @@
 
 #include "cilo72/ic/tmc5160.h"
 #include <math.h>
+#include <float.h>
 
 namespace cilo72
 {
@@ -18,6 +19,7 @@ namespace cilo72
             static const int REGISTER_GCONF = 0x00;
             static const int REGISTER_GSTAT = 0x01;
             static const int REGISTER_IOIN = 0x04;
+            static const int REGISTER_GLOBAL_SCALER = 0x0B;
             static const int REGISTER_IHOLD_IRUN = 0x10;
             static const int REGISTER_TSTEP = 0x12;
             static const int REGISTER_TPWMTHRS = 0x13;
@@ -39,10 +41,17 @@ namespace cilo72
             static const int REGISTER_SW_MODE = 0x34;
             static const int REGISTER_RAMP_STAT = 0x35;
             static const int REGISTER_XLATCH = 0x36;
+            static const int REGISTER_ENCMODE = 0x38;
+            static const int REGISTER_X_ENC = 0x39;
+            static const int REGISTER_ENC_CONST = 0x3A;
+            static const int REGISTER_ENC_STATUS = 0x3B;
+            static const int REGISTER_ENC_LATCH = 0x3C;
+            static const int REGISTER_ENC_DEVIATION = 0x3D;
             static const int REGISTER_CHOPCONF = 0x6C;
             static const int REGISTER_COOLCONF = 0x6D;
             static const int REGISTER_DRV_STATUS = 0x6F;
             static const int REGISTER_PWMCONF = 0x70;
+
         }
         Tmc5160::Tmc5160(cilo72::hw::SPIDevice &spi, uint8_t pin_enable, uint32_t rsens, uint32_t fclk)
             : spi_(spi), pin_enable_(pin_enable), lastReadAddr_(0xFF), rsens_(rsens), fclk_(fclk)
@@ -143,6 +152,11 @@ namespace cilo72
         Tmc5160::Status Tmc5160::gstat(Gstat &value)
         {
             return readRegister(REGISTER_GSTAT, &value.reg);
+        }
+
+        Tmc5160::Status Tmc5160::setGstat(Gstat value)
+        {
+            return writeRegister(REGISTER_GSTAT, value.reg);
         }
 
         Tmc5160::Status Tmc5160::setRampmode(const RampMode value)
@@ -312,7 +326,7 @@ namespace cilo72
                                          // And the register is write only ....
             uint8_t csInt = 0;
 
-            cs = ((current * 1.414 * (rsens_)*32 * 256) / (vfs * 1000 * globalscaler)) - 1;
+            cs = ((current * 1.414 * (rsens_) * 32 * 256) / (vfs * 1000 * globalscaler)) - 1;
 
             if (cs < 0)
             {
@@ -349,6 +363,101 @@ namespace cilo72
             vtmc = rps * fSteps * uSteps * 2.0 * pow(2.0, 23.0) / fclk_;
 
             return vtmc;
+        }
+
+        Tmc5160::Status Tmc5160::setEncMode(EncMode value)
+        {
+            return writeRegister(REGISTER_ENCMODE, value.reg);
+        }
+
+        Tmc5160::Status Tmc5160::encMode(EncMode &value)
+        {
+            return readRegister(REGISTER_ENCMODE, &value.reg);
+        }
+
+        Tmc5160::Status Tmc5160::setXEnc(int32_t value)
+        {
+            return writeRegister(REGISTER_X_ENC, value);
+        }
+
+        Tmc5160::Status Tmc5160::xEnc(int32_t &value)
+        {
+            return readRegister(REGISTER_X_ENC, reinterpret_cast<uint32_t *>(&value));
+        }
+
+        Tmc5160::Status Tmc5160::setEncConst(int32_t &value)
+        {
+            return writeRegister(REGISTER_ENC_CONST, value);
+        }
+
+        Tmc5160::Status Tmc5160::encStatus(Enc_Status &value)
+        {
+            Tmc5160::Status status = readRegister(REGISTER_ENC_STATUS, &value.reg); // R+WC for TMC5160
+            status = writeRegister(REGISTER_ENC_STATUS, value.reg);                 // clear flags set during above read
+            return status;
+        }
+
+        Tmc5160::Status Tmc5160::encLatch(int32_t &value)
+        {
+            return readRegister(REGISTER_ENC_LATCH, reinterpret_cast<uint32_t *>(&value));
+        }
+
+        Tmc5160::Status Tmc5160::setEncDeviation(uint32_t &value)
+        {
+            return writeRegister(REGISTER_ENC_DEVIATION, value);
+        }
+
+        void Tmc5160::setEncoderFactor(double factor)
+        {
+            EncMode mode;
+            encMode(mode);
+
+            double integral;
+            double fraction = std::modf(factor, &integral);
+            double dummy;
+
+            union Factor
+            {
+                struct
+                {
+                    uint16_t fraction;
+                    int16_t factor;
+                };
+                int32_t reg;
+            };
+
+            Factor f;
+
+            static constexpr double FRACTION_BINARY = 65536.0;
+            static constexpr double FRACTION_DECIMAL = 10000.0;
+
+            f.factor = integral;
+
+            double errorBinary = std::modf(FRACTION_BINARY * fraction, &dummy);
+            double errorDecimal = std::modf(FRACTION_DECIMAL * fraction, &dummy);
+
+            if (errorBinary < errorDecimal)
+            {
+                f.fraction = (uint16_t)(fraction * FRACTION_BINARY);
+                mode.enc_sel_decimal = 0;
+            }
+            else
+            {
+                f.fraction = (uint16_t)(fraction * FRACTION_DECIMAL);
+                mode.enc_sel_decimal = 1;
+            }
+            setEncConst(f.reg);
+            setEncMode(mode);
+        }
+
+        Tmc5160::Status Tmc5160::setGlobalScaler(GlobalScaler value)
+        {
+            return writeRegister(REGISTER_GLOBAL_SCALER, value.reg);
+        }
+
+        Tmc5160::Status Tmc5160::setPwmCoil(PwmCoil value)
+        {
+            return writeRegister(REGISTER_XTARGET, value.reg);
         }
 
     }

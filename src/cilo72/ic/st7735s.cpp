@@ -10,7 +10,7 @@ namespace cilo72
     namespace ic
     {
         ST7735S::ST7735S(cilo72::graphic::FramebufferRGB565 & fb, cilo72::hw::SPIDevice &spi, uint8_t pinDC, uint8_t pinRST, uint8_t pinBL)
-            : fb_(fb), spi_(spi), pinDC_(pinDC, cilo72::hw::Gpio::Direction::Output, cilo72::hw::Gpio::Level::Low), pinRST_(pinRST, cilo72::hw::Gpio::Direction::Output, cilo72::hw::Gpio::Level::High), pinBL_(pinBL, cilo72::hw::Gpio::Direction::Output, cilo72::hw::Gpio::Level::High), scanDirection_(ScanDirection::Horizontal), swap_(false)
+            : fb_(fb), spi_(spi), pinDC_(pinDC, cilo72::hw::Gpio::Direction::Output, cilo72::hw::Gpio::Level::Low), pinRST_(pinRST, cilo72::hw::Gpio::Direction::Output, cilo72::hw::Gpio::Level::High), pinBL_(pinBL), scanDirection_(ScanDirection::Horizontal), swap_(false)
         {
             union 
             {
@@ -26,6 +26,14 @@ namespace cilo72
             
             spi_.setBaudrate(10000000);
             spi_.setFormat(8, SPI_CPOL_0, SPI_CPHA_0);
+
+            pinRST_.clear();
+            sleep_ms(100);
+            pinRST_.set();
+
+            pinBL_.setFrequency(100);
+            pinBL_.setDutyCycleU32(100);
+            pinBL_.enable();
         }
 
         void ST7735S::init() const
@@ -328,5 +336,9 @@ namespace cilo72
             cmd(CMD_MADCTL, tx, sizeof(tx));
         }
 
+        void ST7735S::setBacklight(uint32_t level) const
+        {
+            pinBL_.setDutyCycleU32(level);
+        }
     }
 }

@@ -13,6 +13,7 @@ namespace cilo72
         StateMachine::StateMachine(State *state)
             : state_(state)
         {
+            state_->onEnter();
         }
 
         void StateMachine::run()
@@ -43,6 +44,26 @@ namespace cilo72
                 }
             }
             break;
+            }
+        }
+
+        void StateMachine::changeState(State *state)
+        {
+            state_->onExit();
+            state->onEnter();
+            state_ = state;
+        }
+
+        bool StateMachine::changeStateIfOther(State *state)
+        {
+            if(state != state_)
+            {
+                changeState(state);
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

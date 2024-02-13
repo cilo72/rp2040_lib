@@ -37,7 +37,9 @@ add_library(${PROJECT_NAME}
         src/cilo72/hw/spi_bus.cpp
         src/cilo72/hw/spi_device.cpp
         src/cilo72/hw/uart.cpp
+        src/cilo72/hw/pwm.cpp
         src/cilo72/hw/gpiokey.cpp
+        src/cilo72/hw/adc.cpp
         src/cilo72/ic/ws2812.cpp
         src/cilo72/ic/ky_040.cpp
         src/cilo72/ic/ssd1306.cpp
@@ -70,5 +72,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC src)
 target_link_libraries(${PROJECT_NAME} PRIVATE pico_stdlib hardware_pio)
 target_link_libraries(${PROJECT_NAME} PRIVATE pico_stdlib hardware_i2c)
 target_link_libraries(${PROJECT_NAME} PRIVATE pico_stdlib hardware_spi)
+target_link_libraries(${PROJECT_NAME} PRIVATE pico_stdlib hardware_pwm)
+target_link_libraries(${PROJECT_NAME} PRIVATE pico_stdlib hardware_adc)
 
 #pico_add_extra_outputs(${PROJECT_NAME})

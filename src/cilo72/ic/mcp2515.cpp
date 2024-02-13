@@ -137,7 +137,7 @@ namespace cilo72
         MCP2515::MCP2515(cilo72::hw::SPIDevice &spi, const Oscillator oscillator, const Bitrate bitrate)
             : spi_(spi), oscillator_(oscillator), bitrate_(bitrate)
         {
-            spi_.setFormat(8, SPI_CPOL_0, SPI_CPHA_0);
+            spi_.setFormat(8, SPI_CPOL_1, SPI_CPHA_1);
         }
 
         MCP2515::Error MCP2515::reset()

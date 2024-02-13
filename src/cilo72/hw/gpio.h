@@ -26,8 +26,15 @@ namespace cilo72
                 High
             };
 
-            Gpio(uint pin, Direction direction, Level level = Level::Low)
-                : pin_(pin)
+            enum class Pull
+            {
+                None,
+                Up,
+                Down
+            };
+
+            Gpio(uint pin, Direction direction, Pull pull, Level level = Level::Low)
+            : pin_(pin)
             {
                 gpio_init(pin);
                 switch (direction)
@@ -39,8 +46,27 @@ namespace cilo72
 
                 case Direction::Input:
                     gpio_set_dir(pin, GPIO_IN);
+                    switch (pull)
+                    {
+                    case Pull::None:
+                        gpio_set_pulls(pin, false, false);
+                        break;
+
+                    case Pull::Up:
+                        gpio_set_pulls(pin, true, false);
+                        break;
+
+                    case Pull::Down:
+                        gpio_set_pulls(pin, false, true);
+                        break;
+                    }
                     break;
                 }
+            }
+
+            Gpio(uint pin, Direction direction, Level level = Level::Low)
+                : Gpio(pin, direction, Pull::None, level)
+            {
             }
 
             void set(Level level) const
@@ -61,6 +87,11 @@ namespace cilo72
             void toggle() const
             {
                 gpio_put(pin_, not gpio_get_out_level(pin_));
+            }
+
+            bool get() const
+            {
+                return gpio_get(pin_);
             }
 
         private:

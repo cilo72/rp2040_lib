@@ -78,6 +78,25 @@ namespace cilo72
             };
 
             /**
+             * @brief Struct representing the GLOBALSCALER register on the Trinamic TM1560
+             */
+            struct GlobalScaler
+            {
+                union
+                {
+                    /**
+                     * @brief Struct representing the bit fields in the GSTAT register
+                     */
+                    struct
+                    {
+                        uint32_t globalScaler : 8;   /**< Bit 0: GLOBALSCALER */
+                        uint32_t dummy : 24;         /**< Bits 8-31: Reserved for Future Use */
+                    };
+                    uint32_t reg; /**< Raw register value */
+                };
+            };
+
+            /**
              * @brief Struct representing the GCONF register in Trinamic TM1560
              */
             struct Gconf
@@ -336,6 +355,70 @@ namespace cilo72
                 };
             };
 
+            /*!
+              \brief Bit field for register *ENCMODE* - encoder configuration and use of N channel,
+              see [TMC51xx datasheet](@ref TMC51xxDatasheet) chapter 6.4 and 6.4.1.
+             */
+            struct EncMode
+            {
+                union
+                {
+                    struct
+                    {
+                        uint32_t pol_A : 1;
+                        uint32_t pol_B : 1;
+                        uint32_t pol_N : 1;
+                        uint32_t ignore_AB : 1;
+                        uint32_t clr_cont : 1;
+                        uint32_t clr_once : 1;
+                        uint32_t pos_edge : 1;
+                        uint32_t neg_edge : 1;
+                        uint32_t clr_enc_x : 1;
+                        uint32_t latch_x_act : 1;
+                        uint32_t enc_sel_decimal : 1;
+                        uint32_t dummy : 21;
+                    };
+                    uint32_t reg;
+                };
+            };
+
+            struct PwmCoil
+            {
+                union
+                {
+                    struct
+                    {
+                        uint32_t pwmA : 9;   //0..8
+                        uint32_t dummy1 : 7;
+                        uint32_t pwmB : 9;   //16..24
+                        uint32_t dummy2 : 7;
+                    };
+                    uint32_t reg;
+                };
+            };
+
+            /*!
+              \brief Bit field for register *ENC_STATUS* - encoder status information,
+              see [TMC51xx datasheet](@ref TMC51xxDatasheet) chapter 6.4.
+              \note Some bits of this register have a different meaning for the TMC5130 and TMC5160,
+                    please look up the differences in the [TMC5130 datasheet](@ref TMC5130Datasheet)
+                    and [TMC5160 datasheet](@ref TMC5160Datasheet). \n
+                    - TMC5160: write '1' bit to clear respective flags
+             */
+            struct Enc_Status
+            {
+                union
+                {
+                    struct
+                    {
+                        uint32_t n_event : 1;
+                        uint32_t deviation_warn : 1; //!< TMC5160 only
+                        uint32_t dummy : 30;
+                    };
+                    uint32_t reg;
+                };
+            };
+
             /**
              * @brief The ramp mode of the Trinamic TM1560.
              */
@@ -352,7 +435,7 @@ namespace cilo72
              * @param spi          SPI device object for TM1560.
              * @param pin_enable   Pin number for TM1560 enable pin.
              * @param rsens        Sense resistor value (default: 75).
-             * @param fclk         SPI clock frequency (default: 12000000).
+             * @param fclk         Clock frequency (default: 12000000).
              */
             Tmc5160(cilo72::hw::SPIDevice &spi, uint8_t pin_enable, uint32_t rsens = 75, uint32_t fclk = 12000000);
 
@@ -398,6 +481,7 @@ namespace cilo72
              * @return The status of the operation.
              */
             Status gstat(Gstat &value);
+            Status setGstat(Gstat value);
 
             /**
              * @brief Set the value of the RAMP_MODE register.
@@ -501,7 +585,7 @@ namespace cilo72
              */
             Status setTZeroWait(uint32_t value);
 
-             /**
+            /**
              * @brief Sets the target position of the motor
              *
              * @param value The target position value
@@ -654,7 +738,29 @@ namespace cilo72
              */
             double rps2Vtmc(double rps, uint16_t uSteps, uint16_t fSteps);
 
-        private:
+            Status setEncMode(EncMode value);
+
+            Status encMode(EncMode &value);
+
+            Status setXEnc(int32_t value);
+
+            Status xEnc(int32_t &value);
+
+            Status setEncConst(int32_t &value);
+
+            Status encStatus(Enc_Status &value);
+
+            Status encLatch(int32_t &value);
+
+            Status setEncDeviation(uint32_t &value);
+
+            void setEncoderFactor(double f);
+
+            Status setGlobalScaler(GlobalScaler value);
+
+            Status setPwmCoil(PwmCoil value);
+
+         private:
             cilo72::hw::SPIDevice &spi_;
             uint8_t pin_enable_;
             uint8_t lastReadAddr_;

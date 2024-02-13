@@ -29,6 +29,14 @@ namespace cilo72
        * This method must be called in a loop.
        */
       void run();
+
+      /*!
+       * \brief changeState Change the state
+       * \param state New state
+       */
+      void changeState(State *state);
+
+      bool changeStateIfOther(State *state);
     private:
       State *state_;
     };

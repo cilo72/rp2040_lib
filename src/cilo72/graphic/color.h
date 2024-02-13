@@ -46,6 +46,10 @@ namespace cilo72
        */
       uint16_t toRGB565(const Color &color, bool swapBytes = false) const;
 
+      uint8_t r() const { return r_; }
+      uint8_t g() const { return g_; }
+      uint8_t b() const { return b_; }
+
     protected:
       uint8_t r_;
       uint8_t g_;

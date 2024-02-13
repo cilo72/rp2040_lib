@@ -9,21 +9,19 @@ namespace cilo72
 {
     namespace hw
     {
-        GpioKey::GpioKey(uint8_t pinKey)
+        GpioKey::GpioKey(uint8_t pinKey, Gpio::Pull pull = Gpio::Pull::None)
             : repeatingTimer_(100, [&]()
                               { GpioKey::timerCallback(); }),
-                              pinKey_(pinKey),
+                              gpio_(pinKey, Gpio::Direction::Input, pull),
                               pressed_(false)
 
         {
-            gpio_init(pinKey_);
-            gpio_set_dir(pinKey_, GPIO_IN);
-            down_ = lastDown_ = debounceSW_.in(gpio_get(pinKey_));
+            down_ = lastDown_ = debounceSW_.in(gpio_.get());
         }
 
         void GpioKey::timerCallback()
         {
-            down_ = not debounceSW_.in(gpio_get(pinKey_));
+            down_ = not debounceSW_.in(gpio_.get());
 
             if(lastDown_ == false and down_ == true)
             {

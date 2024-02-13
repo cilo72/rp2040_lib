@@ -155,8 +155,40 @@ namespace cilo72
       }
     }
 
-    void Framebuffer::drawString(uint32_t x, uint32_t y, uint32_t scale, const char *s, Color color, const cilo72::fonts::Font &font)
+    void Framebuffer::drawString(uint32_t x, uint32_t y, uint32_t scale, const char *s, Color color, const cilo72::fonts::Font &font, Position position)
     {
+      switch(position)
+      {
+        case TopLeft:
+          break;
+
+          case TopRight:
+          x -= (font.width() * scale * strlen(s) + font.spacingPerChar() * scale * (strlen(s) - 1));
+          break;
+
+        case Center:
+          x -= ((font.width() * scale * strlen(s) + font.spacingPerChar() * scale * (strlen(s) - 1)) / 2);
+          y -= (font.height() * scale) / 2;
+          break;
+
+        case BottomLeft:
+          y -= font.height() * scale;
+          break;
+      
+          case BottomRight:
+          x -= (font.width() * scale * strlen(s) + font.spacingPerChar() * scale * (strlen(s) - 1));
+          y -= font.height() * scale;
+          break;
+
+          case CenterRight:
+          x -= (font.width() * scale * strlen(s) + font.spacingPerChar() * scale * (strlen(s) - 1));
+          y -= (font.height() * scale) / 2;
+          break;
+
+          case CenterLeft:
+          y -= (font.height() * scale) / 2;
+          break;
+      }
       for (int32_t x_n = x; *s; x_n += (font.width() + font.spacingPerChar()) * scale)
       {
         drawChar(x_n, y, scale, *(s++), color, font);

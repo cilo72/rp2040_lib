@@ -4,6 +4,7 @@ The RP2040 library contains C++ classes for RP2040 peripherals:
 - UART
 - PIO
 - I2C
+- PWM
 
 The RP2040 library contains C++ classes for some integrated circuits, displays, modules or switches:
 - Neopixel WS2812

@@ -28,6 +28,7 @@ namespace cilo72
              */
             ElapsedTimer_ms()
                 : start_(0)
+                , running_(false)
             {
             }
 
@@ -37,6 +38,24 @@ namespace cilo72
             void start()
             {
                 start_ = TimerTick_ms::now();
+                running_ = true;
+            }
+
+            /*!
+                * @brief Marks the timer as invalid by setting the start time to zero and the running flag to false.
+             */
+            void invalidate()
+            {
+                start_ = 0;
+                running_ = false;
+            }
+
+            /*!
+                @brief Checks whether the timer is valid.
+            */
+            bool isValid() const
+            {
+                return running_;
             }
 
             /**
@@ -60,6 +79,7 @@ namespace cilo72
 
         private:
             uint32_t start_; /**< The start time of the timer in milliseconds. */
+            bool running_;   /**< True if the timer is running, false otherwise. */
         };
     }
 }

@@ -17,6 +17,16 @@ namespace cilo72
     class Framebuffer
     {
     public:
+      enum Position
+      {
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight,
+        Center,
+        CenterLeft,
+        CenterRight
+      };
       Framebuffer(uint8_t width, uint8_t height, size_t bufferSize);
       virtual void clear(const Color &color = Color(0, 0, 0)) = 0;
 
@@ -126,7 +136,7 @@ namespace cilo72
        * @param s The string to draw.
        * @param font The font to use. Default is cilo72::fonts::Font8x5().
        */
-      void drawString(uint32_t x, uint32_t y, uint32_t scale, const char *s, Color color = Color::white, const cilo72::fonts::Font &font = cilo72::fonts::Font8x5());
+      void drawString(uint32_t x, uint32_t y, uint32_t scale, const char *s, Color color = Color::white, const cilo72::fonts::Font &font = cilo72::fonts::Font8x5(), Position position = TopLeft);  
 
     protected:
       uint8_t *buffer_;
