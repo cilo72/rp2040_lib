@@ -94,6 +94,11 @@ namespace cilo72
                 return gpio_get(pin_);
             }
 
+            bool isHigh() const
+            {
+                return gpio_get_out_level(pin_);
+            }
+
         private:
             uint pin_;
         };
