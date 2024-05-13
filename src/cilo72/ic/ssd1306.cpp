@@ -6,6 +6,7 @@
 #include "cilo72/ic/ssd1306.h"
 #include "cilo72/fonts/font.h"
 #include <string.h>
+#include <stdio.h>
 
 namespace cilo72
 {
@@ -117,7 +118,7 @@ namespace cilo72
                 }
 
 
-                return index < fb_.bufferSize()+1;
+                return index < fb_.bufferSize();
             });
 
         }
